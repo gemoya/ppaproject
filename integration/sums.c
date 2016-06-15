@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 double h;
-double result = 0;
+double result;
 //double *results;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -21,6 +21,9 @@ void *integration(void *inter){
 	pthread_mutex_unlock(&mutex);
 	//unlock
 
+	double partial = result*h*0.5;
+	printf("resultado parcial: %f\n", partial);
+
 }
 
 int main(int argc, char **argv){
@@ -37,6 +40,9 @@ int main(int argc, char **argv){
 	threads_tab = (pthread_t *)malloc((n)*sizeof(pthread_t));
 	//results = malloc(n*sizeof(double));
 	h = (b-a)/(n-1);
+	result = 0;
+
+	pthread_mutex_init(&mutex, NULL);
 
 	// x_0 to x_n 
 	for(i = 0; i<(n); i++){
@@ -47,8 +53,10 @@ int main(int argc, char **argv){
 
 	for(i=0; i<n; i++) pthread_join(threads_tab[i], NULL);
 
+	pthread_mutex_destroy(&mutex);
 	result = h*0.5*result;
 	printf("El resultado final es %f\n", result );
 
+	free(threads_tab);
 	return 0;
 }
