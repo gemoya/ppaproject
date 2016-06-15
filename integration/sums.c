@@ -13,7 +13,6 @@ double f(double x){
 }
 
 void *integration(void *inter){
-
 	double x_k = *((double *) inter);
 
 	//lock
@@ -25,11 +24,8 @@ void *integration(void *inter){
 }
 
 int main(int argc, char **argv){
-
-	int step;
 	int a,b, n;
-
-	int i,j;
+	int i;
 
 	pthread_t *threads_tab;
 	double x_i;
@@ -40,14 +36,10 @@ int main(int argc, char **argv){
 
 	threads_tab = (pthread_t *)malloc((n)*sizeof(pthread_t));
 	//results = malloc(n*sizeof(double));
-
 	h = (b-a)/(n-1);
-
-
 
 	// x_0 to x_n 
 	for(i = 0; i<(n); i++){
-
 		x_i = a + i*h;
 		pthread_create(&threads_tab[i], NULL, integration, (void *) &x_i);
 
@@ -56,7 +48,6 @@ int main(int argc, char **argv){
 	for(i=0; i<n; i++) pthread_join(threads_tab[i], NULL);
 
 	result = h*0.5*result;
-
 	printf("El resultado final es %f\n", result );
 
 	return 0;
