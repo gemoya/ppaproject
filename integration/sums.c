@@ -13,10 +13,11 @@ double f(double x){
 
 void *integration(void *inter){
 
-	double x_k = (double *) inter;
-	result = result + f(x_k);
-	//results[]
+	double x_k = *((double *) inter);
 
+	//lock
+	result = result + f(x_k);
+	//unlock
 
 }
 
@@ -34,9 +35,9 @@ int main(int argc, char **argv){
 	pthread_t *threads_tab;
 	double x_i;
 
-	a = atoi(&argv[1]);
-	b = atoi(&argv[2]);
-	n = atoi(&argv[3]);
+	a = atoi(argv[1]);
+	b = atoi(argv[2]);
+	n = atoi(argv[3]);
 
 	threads_tab = (pthread_t *)malloc((n)*sizeof(pthread_t));
 	//results = malloc(n*sizeof(double));
@@ -49,13 +50,15 @@ int main(int argc, char **argv){
 	for(i = 0; i<(n); i++){
 
 		x_i = a + i*h;
-		pthread_create(&threads_tab[i], NULL, integration, (void *) x_i);
+		pthread_create(&threads_tab[i], NULL, integration, (void *) &x_i);
 
 	}
 
-	for(i=0; i<threads; i++) pthread_join(threads_tab[i], NULL);
+	for(i=0; i<n; i++) pthread_join(threads_tab[i], NULL);
 
-	printf("El resultado final es %ld\n", result );
+	result = h*0.5*result;
+
+	printf("El resultado final es %f\n", result );
 
 	return 0;
 }
