@@ -46,7 +46,7 @@ int main(int argc, char **argv){
 
 
 
-	// x_0 to x_n == x_1 to x_1
+	// x_0 to x_n 
 	for(i = 0; i<(n); i++){
 
 		x_i = a + i*h;
