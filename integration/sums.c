@@ -5,6 +5,7 @@
 double h;
 double result = 0;
 //double *results;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 double f(double x){
 
@@ -16,14 +17,12 @@ void *integration(void *inter){
 	double x_k = *((double *) inter);
 
 	//lock
+	pthread_mutex_lock(&mutex);
 	result = result + f(x_k);
+	pthread_mutex_unlock(&mutex);
 	//unlock
 
 }
-
-
-
-
 
 int main(int argc, char **argv){
 
