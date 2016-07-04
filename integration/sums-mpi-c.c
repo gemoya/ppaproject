@@ -4,6 +4,12 @@
 
 int N;
 
+double f(double x){
+
+	return x*x;
+}
+
+
 void trapezoidRule(double *starto, double *result){
 
 	int i;
@@ -29,32 +35,30 @@ int main(int argc, char **argv){
 
 	int i = 0;
 	int rank, numprocs;
-	double a,b;
+	int a,b;
 	double resto;
 	int x_i;
 
-	int *sendbuffer, *recbuffer;
-
+	double *sendbuffer, *recbuffer;
 
 	a = atoi(argv[1]);
 	b = atoi(argv[2]);
 
-
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-	double result;
-	double final;
+	double result[1];
+	double final[1];
 
 	N=(b-a+1)/numprocs;
 	resto = (b-a+1)%numprocs;
 	
-	recbuffer = (int *)malloc(sizeof(int)*((b-a+1-resto)/numprocs));
+	recbuffer = (double *)malloc(sizeof(int)*((b-a+1-resto)/numprocs));
 
 	
 	if (rank == 0){
 
-		sendbuffer = (int *)malloc(sizeof(int)*(b-a+1-resto));
+		sendbuffer = (double *)malloc(sizeof(int)*(b-a+1-resto));
 		//fill buffer
 		x_i = a;
 		while(i<(b-a)+1){
@@ -62,20 +66,23 @@ int main(int argc, char **argv){
 			sendbuffer[i] = x_i;
 			i++;
 		}
-
 		// pasando todo el buffer tal vez es mejor sin pasar todo el buffer
 		MPI_Scatter(sendbuffer,N,MPI_INT,&recbuffer,N,MPI_INT,0,MPI_COMM_WORLD);
 	}
 
-	trapezoidRule(&recbuffer[0], &result);
+	trapezoidRule(&recbuffer[0], &result[0]);
+	MPI_Reduce(&result, &final, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	for (i = (b-a+1-resto); i<(b-a+1); i++){
+		if (i+1>=b-a+1){
+			final[0] = final[0] + f(sendbuffer[i]);
+		} else{
+			final[0] = final[0] + 2*f(sendbuffer[i]);
 
-	MPI_Reduce(result, final, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+		}
 
+	}
 
-
-
-
-
+	printf("El resultado final es %f\n", final[0]);
 
 
 	return 0;
