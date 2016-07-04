@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <math.h>
 
 double h;
 double result;
@@ -9,9 +10,13 @@ double step;
 //double *results;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
+double exp(double x);
+
+
 double f(double x){
 
-	return x*x;
+	return sin(x);
+	//return x*x;
 }
 
 

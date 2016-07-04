@@ -15,7 +15,7 @@ void trapezoidRule(double *starto, double *result){
 	int i;
 	double x_i;
 	double a =  *starto;
-	printf("En trapezoidRule %f\n", a);
+	//printf("En trapezoidRule %f\n", a);
 	//printf("a: %f\n", a);
 	double b = a + N-1;
 	//printf("b: %f\n", b);
@@ -27,7 +27,7 @@ void trapezoidRule(double *starto, double *result){
 		x_i = a + i*h;
 		temp = temp+ 2*f(x_i);
 	}
-	*result = *result + h*0.5*temp;
+	*result = (*result) + h*0.5*temp;
 
 }
 
@@ -41,6 +41,8 @@ int main(int argc, char **argv){
 	int x_i;
 
 	double *sendbuffer, *recbuffer;
+	double final=0.0;
+	double result;
 
 	a = atoi(argv[1]);
 	b = atoi(argv[2]);
@@ -48,32 +50,32 @@ int main(int argc, char **argv){
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-	double result;
-	double final;
 
-	N=(b-a+1)/numprocs;
-	resto = (b-a+1)%numprocs;
+
+	N=(b-a)/numprocs;
+	resto = (b-a)%numprocs;
 	
-	recbuffer = (double *)malloc(sizeof(int)*((b-a+1)/numprocs));
+	// recbuffer = (double *)malloc(sizeof(double)*((b-a+1)/numprocs));
+	// recbuffer = (double *)malloc(sizeof(double)*((b-a+1)/numprocs));
 
-	sendbuffer = (double *)malloc(sizeof(int)*(b-a+1-resto));
-	if (rank == 0){
+	sendbuffer = (double *)malloc(sizeof(double)*(b-a));
+	// if (rank == 0){
 
-		//sendbuffer = (double *)malloc(sizeof(int)*(b-a+1-resto));
-		//fill buffer
-		x_i = a;
-		i=0;
-		while(i<(b-a)+1-resto){
+	// 	//sendbuffer = (double *)malloc(sizeof(int)*(b-a+1-resto));
+	// 	//fill buffer
+	// 	x_i = a;
+	// 	i=0;
+	// 	while(i<(b-a)){
 
-			x_i = a + i;
-			sendbuffer[i] = x_i;
-			i++;
-		}
-		// pasando todo el buffer tal vez es mejor sin pasar todo el buffer
+	// 		x_i = a + i;
+	// 		sendbuffer[i] = x_i;
+	// 		i++;
+	// 	}
+	// 	// pasando todo el buffer tal vez es mejor sin pasar todo el buffer
 
-	}
+	// }
 	//MPI_Scatter(sendbuffer,N,MPI_DOUBLE,recbuffer,N,MPI_DOUBLE,0,MPI_COMM_WORLD);
-	MPI_Bcast(sendbuffer, (b-a)+1-resto, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	//MPI_Bcast(sendbuffer, N, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
 	double wea = rank*N;
 	trapezoidRule( &wea, &result);
