@@ -15,6 +15,7 @@ void trapezoidRule(double *starto, double *result){
 	int i;
 	double x_i;
 	double a =  *starto;
+	printf("En trapezoidRule %f\n", a);
 	//printf("a: %f\n", a);
 	double b = a + N-1;
 	//printf("b: %f\n", b);
@@ -53,7 +54,7 @@ int main(int argc, char **argv){
 	N=(b-a+1)/numprocs;
 	resto = (b-a+1)%numprocs;
 	
-	recbuffer = (double *)malloc(sizeof(int)*((b-a+1-resto)/numprocs));
+	recbuffer = (double *)malloc(sizeof(int)*((b-a+1)/numprocs));
 
 	
 	if (rank == 0){
@@ -61,15 +62,31 @@ int main(int argc, char **argv){
 		sendbuffer = (double *)malloc(sizeof(int)*(b-a+1-resto));
 		//fill buffer
 		x_i = a;
-		while(i<(b-a)+1){
-			x_i = x_i + i;
+		i=0;
+		while(i<(b-a)+1-resto){
+
+			x_i = a + i;
 			sendbuffer[i] = x_i;
 			i++;
 		}
 		// pasando todo el buffer tal vez es mejor sin pasar todo el buffer
-		MPI_Scatter(sendbuffer,N,MPI_INT,&recbuffer,N,MPI_INT,0,MPI_COMM_WORLD);
+		printf("pasando al scatter\n");
+
+	}
+	MPI_Scatter(sendbuffer,N,MPI_DOUBLE,recbuffer,N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	//debug
+	if (rank == 0){
+		for(i = 0; i<N; i++){
+			printf("PROC:%d, Elemento #%d, valor: %f\n", rank, i,recbuffer[i]);
+		}
+	}
+	if (rank == 1){
+		for(i = 0; i<N; i++){
+			printf("PROC:%d, Elemento #%d, valor: %f\n",rank, i,recbuffer[i]);
+		}
 	}
 
+	printf("Llamando a trapezoidRule con %f\n", recbuffer[0]);
 	trapezoidRule(&recbuffer[0], &result[0]);
 	MPI_Reduce(&result, &final, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 	for (i = (b-a+1-resto); i<(b-a+1); i++){
