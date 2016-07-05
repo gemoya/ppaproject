@@ -6,7 +6,8 @@ double h;
 int N;
 double f(double x){
 
-	return x*x;
+	//return x*x;
+	return x*x*x + 25*x + 31 + (1/x*2);
 }
 
 void trapezoidRule(double *starto){

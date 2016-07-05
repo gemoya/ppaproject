@@ -15,8 +15,9 @@ double exp(double x);
 
 double f(double x){
 
-	return sin(x);
-	//return x*x;
+	//return sin(x);
+	//return x*x*x + 25*x + 31 + (1/x*2) + (100/(x*x*x*x*x));
+	return x*x;
 }
 
 
